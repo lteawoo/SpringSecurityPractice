@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import kr.taeu.SpringSecurityPractice.member.dto.MemberResponse;
+import kr.taeu.SpringSecurityPractice.member.dto.SignInRequest;
 import kr.taeu.SpringSecurityPractice.member.dto.SignUpRequest;
 import kr.taeu.SpringSecurityPractice.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ public class MemberController {
 	}
 	
 	@GetMapping(value = "/api/signin")
-	public String signIn() {
+	public String signIn(@RequestBody @Valid final SignInRequest signInRequest) {
 		return "login?";
 	}
 	

@@ -16,7 +16,7 @@ public class MemberService {
 
 	@Transactional
 	public Member signUp(SignUpRequest req) {
-		boolean isExists = this.memberRepository.existsByEmail(req.getEmail());
+		boolean isExists = memberRepository.existsByEmail(req.getEmail());
 		if(isExists) {
 			//이메일 중복 처리
 			throw new RuntimeException("이메일 중복");
