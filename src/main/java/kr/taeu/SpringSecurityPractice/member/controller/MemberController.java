@@ -23,18 +23,13 @@ public class MemberController {
 		return "is Running...";
 	}
 	
-	@GetMapping(value = "/api/signin")
-	public String signIn(@RequestBody @Valid final SignInRequest signInRequest) {
-		return "login?";
-	}
+//	@GetMapping(value = "/api/signin")
+//	public MemberResponse signIn(@RequestBody @Valid final SignInRequest signInRequest) {
+//		return "login?";
+//	}
 	
 	@PostMapping(value = "/api/signup")
 	public MemberResponse signUp(@RequestBody @Valid final SignUpRequest signUpRequest) {
 		return new MemberResponse(memberService.signUp(signUpRequest));
 	}
-	
-//	@PostMapping(value ="/api/signIn")
-//	public MemberResponse signIn(@Valid SignInRequest signInRequest) {
-//		
-//	}
 }

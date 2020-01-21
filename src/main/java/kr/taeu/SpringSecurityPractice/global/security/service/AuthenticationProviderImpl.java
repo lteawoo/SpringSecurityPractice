@@ -31,7 +31,7 @@ public class AuthenticationProviderImpl implements AuthenticationProvider{
 		/*
 		 * principal credentials로 이루어진 토큰
 		 * principal : Email
-		 * crendentials : Password
+		 * credentials : Password
 		 */
 		
 		UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication;
