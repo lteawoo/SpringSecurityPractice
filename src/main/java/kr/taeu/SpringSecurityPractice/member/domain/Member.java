@@ -1,11 +1,15 @@
 package kr.taeu.SpringSecurityPractice.member.domain;
 
+import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import kr.taeu.SpringSecurityPractice.member.domain.model.Email;
 import kr.taeu.SpringSecurityPractice.member.domain.model.Password;
@@ -30,7 +34,9 @@ public class Member {
 	@Embedded
 	private Password password;
 	
-	@Embedded
+	@Column(name="ROLE", nullable=false)
+	@Enumerated(EnumType.STRING)
+	@NotNull
 	private Role role;
 	
 	@Builder

@@ -1,6 +1,8 @@
 package kr.taeu.SpringSecurityPractice.global.config;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -16,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-	
 	/*
 	 * 스프링 시큐리티 암호화 알고리즘 Bean 등록
 	 */
@@ -26,23 +27,35 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 	
 	/*
+	 * AuthenticationProvider 설정
+	 */
+//	@Override
+//	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+//		auth.authenticationProvider(authenticationProvider)
+//			.userDetailsService();
+//	}
+	
+	/*
 	 * 스프링 시큐리티 룰 설정
 	 */
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		log.info("HttpSecurity config...");
-		http.httpBasic()
-				.disable()
-			.csrf()
-				.disable()
-			.sessionManagement()
-				.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+		http.authorizeRequests()
+			//페이지 권한 설정
+			.antMatchers("/api/status").permitAll()
+			.antMatchers("/api/signin", "/api/signup").permitAll()
+			.anyRequest().hasRole("MEMBER")
 			.and()
-				.authorizeRequests()
-					//페이지 권한 설정
-					.antMatchers("/api/status").permitAll()
-					.antMatchers("/api/signin", "/api/signup").permitAll()
-					.anyRequest().hasRole("MEMBER");
+				.formLogin()
+					.permitAll()
+			.and()
+				.httpBasic()
+					.disable()
+				.csrf()
+					.disable()
+				.sessionManagement()
+					.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 	}
 
 	/*
