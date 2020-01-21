@@ -1,6 +1,7 @@
 package kr.taeu.SpringSecurityPractice.global.config;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -14,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @EnableWebSecurity
-@RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	/*
 	 * 스프링 시큐리티 암호화 알고리즘 Bean 등록
@@ -23,15 +23,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	public PasswordEncoder passwordEncoder() {
 		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
 	}
-	
-	/*
-	 * AuthenticationProvider 설정
-	 */
-//	@Override
-//	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//		auth.authenticationProvider(authenticationProvider)
-//			.userDetailsService();
-//	}
 	
 	/*
 	 * 스프링 시큐리티 룰 설정
@@ -46,8 +37,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.anyRequest().hasRole("MEMBER")
 			.and()
 				.formLogin()
-					.permitAll()
-//					.successForwardUrl("/main")
 			.and()
 				.httpBasic()
 					.disable()
@@ -68,6 +57,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/configuration/security",
                 "/swagger-ui.html",
                 "/webjars/**",
-                "/h2-console/*");
+                "/h2-console/**");
 	}
 }
