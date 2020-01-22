@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	 */
 	@Bean
 	public PasswordEncoder passwordEncoder() {
-		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+		//return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+		return NoOpPasswordEncoder.getInstance();
 	}
 	
 	/*
@@ -34,6 +36,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			//페이지 권한 설정
 			.antMatchers("/api/status").permitAll()
 			.antMatchers("/api/signin", "/api/signup").permitAll()
+			.antMatchers("/oauth/**").permitAll()
+			.antMatchers("/api/callback").permitAll()
 			.anyRequest().hasRole("MEMBER")
 			.and()
 				.formLogin()
@@ -41,9 +45,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.httpBasic()
 					.disable()
 				.csrf()
-					.disable()
-				.sessionManagement()
-					.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+					.disable();
 	}
 
 	/*
