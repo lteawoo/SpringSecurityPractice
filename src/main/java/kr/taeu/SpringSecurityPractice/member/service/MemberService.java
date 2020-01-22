@@ -4,8 +4,6 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.transaction.Transactional;
-
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -14,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import kr.taeu.SpringSecurityPractice.member.dao.MemberRepository;
 import kr.taeu.SpringSecurityPractice.member.domain.Member;
@@ -46,6 +45,7 @@ public class MemberService implements UserDetailsService {
 	}
 	
 	@Override
+	@Transactional(readOnly=true)
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		Optional<Member> findMember = memberRepository.findByEmail(new Email(email));
 		findMember.orElseThrow(() -> new UsernameNotFoundException(email));
