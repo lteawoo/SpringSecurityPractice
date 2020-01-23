@@ -1,17 +1,13 @@
 package kr.taeu.SpringSecurityPractice.global.config;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -33,12 +29,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		log.info("HttpSecurity config...");
 		http.authorizeRequests()
-			//페이지 권한 설정
-			.antMatchers("/api/status").permitAll()
-			.antMatchers("/api/signin", "/api/signup").permitAll()
-			.antMatchers("/oauth/**").permitAll()
-			.antMatchers("/api/callback").permitAll()
-			.anyRequest().hasRole("MEMBER")
+				//페이지 권한 설정
+				.antMatchers("/api/signup").permitAll()
+				.antMatchers("/oauth/**").permitAll()
+				.antMatchers("/api/callback").permitAll()
+				.anyRequest().hasRole("MEMBER")
 			.and()
 				.formLogin()
 			.and()

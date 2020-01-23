@@ -48,7 +48,7 @@ public class MemberService implements UserDetailsService {
 	@Transactional(readOnly=true)
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		Optional<Member> findMember = memberRepository.findByEmail(new Email(email));
-		findMember.orElseThrow(() -> new UsernameNotFoundException(email));
+		findMember.orElseThrow(() -> new UsernameNotFoundException("Incorrect Login credentials"));
 		Member member = findMember.get();
 		
 		/*

@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import kr.taeu.SpringSecurityPractice.member.dto.MemberResponse;
-import kr.taeu.SpringSecurityPractice.member.dto.SignInRequest;
 import kr.taeu.SpringSecurityPractice.member.dto.SignUpRequest;
 import kr.taeu.SpringSecurityPractice.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +21,6 @@ public class MemberController {
 	public String isRunning() {
 		return "is Running...";
 	}
-	
-//	@GetMapping(value = "/api/signin")
-//	public MemberResponse signIn(@RequestBody @Valid final SignInRequest signInRequest) {
-//		return "login?";
-//	}
 	
 	@PostMapping(value = "/api/signup")
 	public MemberResponse signUp(@RequestBody @Valid final SignUpRequest signUpRequest) {
