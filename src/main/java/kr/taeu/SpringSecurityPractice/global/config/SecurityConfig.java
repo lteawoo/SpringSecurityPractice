@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import kr.taeu.SpringSecurityPractice.member.domain.model.Role;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -33,7 +34,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/api/signup").permitAll()
 				.antMatchers("/oauth/**").permitAll()
 				.antMatchers("/api/callback").permitAll()
-				.anyRequest().hasRole("MEMBER")
+				.anyRequest().hasAuthority(Role.MEMBER.name())
 			.and()
 				.formLogin()
 			.and()
@@ -44,7 +45,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 
 	/*
-	 * 스프링 시큐리티 룰 무시하는 URL
+	 * 스프링 시큐리티 룰 무시하는 URL	
 	 */
 	@Override
 	public void configure(WebSecurity web) throws Exception {
