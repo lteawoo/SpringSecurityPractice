@@ -14,6 +14,11 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/*
+ * 인가 설정(AuthorizationServerConfig)을 담당한다.
+ * Client 관련 설정
+ * 토큰 관련 설정 등..
+ */
 @Slf4j
 @Configuration
 @EnableAuthorizationServer
@@ -30,6 +35,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	
 	/*
 	 * 토큰 스토어 JwtTokenStore 사용
+	 * jwt를 사용하므로 토큰 정보를 토큰 자체에서 관리함 -> DB에 토큰 정보관리 불필요
 	 */
 	@Bean
 	public JwtTokenStore tokenStore() {
@@ -48,20 +54,20 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	}
 
 	/*
-     * Client에 대한 인증 처리를 위한 설정
+     * Client 설정
      * 1) InMemory - 기본 구현체 InMemoryClientDetailsService(Map에 클라이언트를 저장)
      * 2) JDBC - 기본 구현체 JdbcClientDetailsService(JdbcTemplate를 이용한 DB이용)
      * 3) ClientDetailsService 설정
      */
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-		log.info("OAuth2AuthorizationServerConfig configure...");
+		log.info("AuthorizationServerConfig configure...");
 		clients//.withClientDetails(clientDetailsService(this.dataSource));
 			.inMemory()
-			.withClient("testClientId")
-			.secret("testSecret")
-			.redirectUris("http://localhost:8080/api/callback") //리다이렉트 URI, 인증요청시의 URI와 매칭되어야한다.
-			.authorizedGrantTypes("authorization_code", "refresh_token") //인증 방식
+			.withClient("taeuClient")	// 인가서버에 등록할 client
+			.secret("taeuSecret")	// 암호키
+			.redirectUris("http://localhost:8080/member/signin") //리다이렉트 URI, 인가 요청 시의 URI와 매칭되어야한다.
+			.authorizedGrantTypes("authorization_code", "refresh_token") //권한 부여 방식
 			.scopes("read", "write") //발급된 AccessToken으로 접근할 수 있는 리소스의 범위. 일단 테스트로 read write를 세팅
 			.accessTokenValiditySeconds(30000); // 토큰의 유효시간(초)
 	}
