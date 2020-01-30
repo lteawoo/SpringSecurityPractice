@@ -30,7 +30,7 @@
 				contentType: "application/json;charset=UTF-8",
 				data: jsonData,
 				success: function(result) {
-					$("#result").html(result.responseText);
+					$("#result").html(result.email.value + ", " + result.password.value + ", " + result.role);
 				},
 				error: function(result) {
 					$("#result").html(result.responseText);
@@ -42,7 +42,7 @@
 </head>
 <body>
 	<div id="result"></div>
-	<form id="signForm" action="/member/signup">
+	<form id="signForm">
 		<table>
 			<tr>
 				<td>email</td>
@@ -52,12 +52,15 @@
 				<td>password</td>
 				<td><input type="text" name="password" value="12345"/></td>
 			</tr>
+			<tr>
 				<td>role</td>
 				<td><input type="text" name="role" value="MEMBER"/></td>
+			</tr>
 			<tr>
 				<td colspan="2">
 					<button type="submit">등록</button>
 				</td>
+			</tr>
 		</table>
 	</form>
 </body>

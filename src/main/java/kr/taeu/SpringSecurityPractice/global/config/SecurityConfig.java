@@ -43,6 +43,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/member/", "/member/signup", "/member/signin").permitAll()
 				.anyRequest().hasAuthority(Role.MEMBER.name())
 			.and()
+				.formLogin()
+					.loginPage("/member/signin")
+					.loginProcessingUrl("/member/signin")
+					.defaultSuccessUrl("/member/status")
+			.and()
 				.csrf()
 					.disable();
 			//.exceptionHandling()

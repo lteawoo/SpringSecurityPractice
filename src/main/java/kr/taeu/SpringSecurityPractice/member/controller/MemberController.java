@@ -43,4 +43,9 @@ public class MemberController {
 	public MemberResponse signUp(@RequestBody @Valid final SignUpRequest signUpRequest) {
 		return new MemberResponse(memberService.signUp(signUpRequest));
 	}
+	
+	@GetMapping(value = "/signin")
+	public ModelAndView signIn() {
+		return new ModelAndView("signin");
+	}
 }
