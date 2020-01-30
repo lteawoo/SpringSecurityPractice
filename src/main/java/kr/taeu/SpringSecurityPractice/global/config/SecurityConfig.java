@@ -7,10 +7,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
-import kr.taeu.SpringSecurityPractice.global.security.authentication.RestAuthenticationEntryPoint;
 import kr.taeu.SpringSecurityPractice.member.domain.model.Role;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,10 +26,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	/*
 	 * 인증되지 않은 요청에 대한 행동을 정의 하는 Bean 등록
 	 */
-	@Bean
-	public AuthenticationEntryPoint authenticationEntryPoint() {
-		return new RestAuthenticationEntryPoint();
-	}
+//	@Bean
+//	public AuthenticationEntryPoint authenticationEntryPoint() {
+//		return new RestAuthenticationEntryPoint();
+//	}
 	
 	/*
 	 * 스프링 시큐리티 룰 설정
@@ -47,9 +44,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.anyRequest().hasAuthority(Role.MEMBER.name())
 			.and()
 				.csrf()
-					.disable()
-			.exceptionHandling()
-				.authenticationEntryPoint(authenticationEntryPoint());
+					.disable();
+			//.exceptionHandling()
+			//	.authenticationEntryPoint(authenticationEntryPoint());
 	}
 
 	/*
@@ -63,6 +60,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/configuration/security",
                 "/swagger-ui.html",
                 "/webjars/**",
-                "/h2-console/**");
+                "/h2-console/**",
+                "/js/**");
 	}
 }
