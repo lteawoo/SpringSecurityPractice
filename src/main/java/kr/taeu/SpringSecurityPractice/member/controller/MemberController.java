@@ -3,6 +3,7 @@ package kr.taeu.SpringSecurityPractice.member.controller;
 import javax.validation.Valid;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,8 +35,8 @@ public class MemberController {
 	}
 	
 	@GetMapping(value = "/signup")
-	public ModelAndView signUp() {
-		return new ModelAndView("signup");
+	public String signUp(Model model) {
+		return "signup";
 	}
 	
 	@PostMapping(value = "/signup")
