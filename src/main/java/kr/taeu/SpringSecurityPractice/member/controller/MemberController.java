@@ -1,7 +1,12 @@
 package kr.taeu.SpringSecurityPractice.member.controller;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 @Controller
 @RequiredArgsConstructor
 public class MemberController {
+	private final OAuth2AuthorizedClientService authorizedClientService;
 	private final MemberService memberService;
 	
 	@GetMapping(value = "/")
@@ -30,7 +36,10 @@ public class MemberController {
 	
 	@GetMapping(value = "/status")
 	@ResponseBody
-	public String isRunning() {
+	public String isRunning(@AuthenticationPrincipal OAuth2User principal) {
+//		OAuth2AuthorizedClient client = authorizedClientService
+//				.loadAuthorizedClient(authentication.getAuthorizedClientRegistrationId(),
+//						authentication.getName());
 		return "is Running...";
 	}
 	

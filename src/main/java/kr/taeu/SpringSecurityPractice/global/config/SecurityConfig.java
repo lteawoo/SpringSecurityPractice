@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -17,6 +18,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
 import kr.taeu.SpringSecurityPractice.member.domain.model.Role;
 import lombok.extern.slf4j.Slf4j;
@@ -66,7 +70,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				clientRegistration = CommonOAuth2Provider.GOOGLE.getBuilder(clientName)
 						.clientId(registration.getClientId())
 						.clientSecret(registration.getClientSecret())
-						.redirectUriTemplate(registration.getRedirectUri())
+						//.redirectUriTemplate(registration.getRedirectUri()) //oauth authorziation server의 redirection uri와 일치해야함.
+						.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
 						.scope("email", "profile")
 						.build();
 				break;
@@ -84,26 +89,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests()
 				//페이지 권한 설정
 				.antMatchers("/oauth/**").permitAll()
-				.antMatchers("/member/", "/member/signup", "/member/signin").permitAll()
-				.anyRequest().hasAuthority(Role.MEMBER.name())
+				.antMatchers("/member/", "/member/signup", "/member/signin/**").permitAll()
+				.anyRequest().authenticated() // 모든요청은 인가되어야함.
+			.and()
+				.exceptionHandling()
+					.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/member/signin")) //login page 정의
 			.and()
 				.oauth2Login()
-				//.clientRegistrationRepository(clientRegistrationRepository())
-				.loginPage("/member/signin")
-//				.loginProcessingUrl("/member/signin")
-//				.defaultSuccessUrl("/member/status")
-//				.failureUrl("/member/signin")
+				.defaultSuccessUrl("/member/status")
 			.and()
 				.csrf()
 					.disable();
-			//.and()
-			//	.formLogin()
-			//		.loginPage("/member/signin")
-			//		.loginProcessingUrl("/member/signin")
-			//		.defaultSuccessUrl("/member/status")
-
-			//.exceptionHandling()
-			//	.authenticationEntryPoint(authenticationEntryPoint());
 	}
 
 	/*
