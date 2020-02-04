@@ -1,12 +1,11 @@
 package kr.taeu.SpringSecurityPractice.member.controller;
 
+import java.util.Enumeration;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +19,9 @@ import kr.taeu.SpringSecurityPractice.member.dto.MemberResponse;
 import kr.taeu.SpringSecurityPractice.member.dto.SignUpRequest;
 import kr.taeu.SpringSecurityPractice.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequestMapping(value = "/member")
 @Controller
 @RequiredArgsConstructor
@@ -36,10 +37,14 @@ public class MemberController {
 	
 	@GetMapping(value = "/status")
 	@ResponseBody
-	public String isRunning(@AuthenticationPrincipal OAuth2User principal) {
+	public String isRunning(HttpServletRequest request) {
 //		OAuth2AuthorizedClient client = authorizedClientService
 //				.loadAuthorizedClient(authentication.getAuthorizedClientRegistrationId(),
 //						authentication.getName());
+		Enumeration<String> s = request.getHeaderNames();
+		while(s.hasMoreElements()) {
+			log.info(request.getHeader(s.nextElement()).intern());
+		} //JSESSION을 남긴다... -> 굳이 필요한가? FRONT로넘겨보자.
 		return "is Running...";
 	}
 	

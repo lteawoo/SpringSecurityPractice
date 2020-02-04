@@ -102,11 +102,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.and()
 				.oauth2Login()
 					.authorizationEndpoint()
-						.baseUri("/member/oauth2/authorize")
+						.baseUri("/member/oauth2/authorize") //OAuth2 인가서버들의 baseuri설정 default:/login/oauth2/code/
 						.authorizationRequestRepository(customAuthorizationRequestRepository())
 				.and()
 					.defaultSuccessUrl("/member/status")
-			.and()
+			.and()	
 				.csrf()
 					.disable();
 	}
