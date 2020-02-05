@@ -1,18 +1,25 @@
 package kr.taeu.SpringSecurityPractice.member.controller;
 
-import java.util.Enumeration;
+import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import kr.taeu.SpringSecurityPractice.member.dto.MemberResponse;
@@ -35,17 +42,24 @@ public class MemberController {
 		return "hello";
 	}
 	
-	@GetMapping(value = "/status")
-	@ResponseBody
-	public String isRunning(HttpServletRequest request) {
-//		OAuth2AuthorizedClient client = authorizedClientService
-//				.loadAuthorizedClient(authentication.getAuthorizedClientRegistrationId(),
-//						authentication.getName());
-		Enumeration<String> s = request.getHeaderNames();
-		while(s.hasMoreElements()) {
-			log.info(request.getHeader(s.nextElement()).intern());
-		} //JSESSION을 남긴다... -> 굳이 필요한가? FRONT로넘겨보자.
-		return "is Running...";
+	@GetMapping(value = "/signsuccess")
+	public String signSuccess(Model model, OAuth2AuthenticationToken authentication) {
+		OAuth2AuthorizedClient client = authorizedClientService.loadAuthorizedClient(authentication.getAuthorizedClientRegistrationId(), authentication.getName());
+		
+		String userInfoEndpointUri = client.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUri();
+		
+		if(!StringUtils.isEmpty(userInfoEndpointUri)) {
+			RestTemplate restTemplate = new RestTemplate();
+			HttpHeaders headers = new HttpHeaders();
+			
+			headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + client.getAccessToken().getTokenValue());
+			HttpEntity entity = new HttpEntity("", headers);
+			ResponseEntity<Map> response = restTemplate.exchange(userInfoEndpointUri, HttpMethod.GET, entity, Map.class);
+			Map userAttributes = response.getBody();
+			
+			model.addAttribute("name", userAttributes.get("name"));
+		}
+		return "signsuccess";
 	}
 	
 	@GetMapping(value = "/signup")

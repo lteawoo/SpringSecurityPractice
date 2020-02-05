@@ -14,6 +14,10 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.NimbusAuthorizationCodeTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
@@ -85,6 +89,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		return new HttpSessionOAuth2AuthorizationRequestRepository();
 	}
 	
+	@Bean
+	public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> accessTokenResponseClient() {
+		//return new NimbusAuthorizationCodeTokenResponseClient();
+		return new DefaultAuthorizationCodeTokenResponseClient();
+	}
+	
 	/*
 	 * 스프링 시큐리티 룰 설정
 	 */
@@ -105,7 +115,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 						.baseUri("/member/oauth2/authorize") //OAuth2 인가서버들의 baseuri설정 default:/login/oauth2/code/
 						.authorizationRequestRepository(customAuthorizationRequestRepository())
 				.and()
-					.defaultSuccessUrl("/member/status")
+					.tokenEndpoint()
+						.accessTokenResponseClient(accessTokenResponseClient()) //tokenEndpoint(code로 token 받아오는..)
+				.and()
+					.userInfoEndpoint()	//token으로  userinfo 받아옴
+				.and()
+					.defaultSuccessUrl("/member/signsuccess")
 			.and()	
 				.csrf()
 					.disable();
