@@ -20,12 +20,17 @@ import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCo
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
+import kr.taeu.SpringSecurityPractice.global.security.oauth2.client.CustomOAuth2Provider;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -66,10 +71,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	private ClientRegistration getRegistration(OAuth2ClientProperties clientProperties, String clientName) {
 		ClientRegistration clientRegistration = null;
-
+		OAuth2ClientProperties.Registration registration = null;
 		switch(clientName) {
 			case "google" : 
-				OAuth2ClientProperties.Registration registration = clientProperties.getRegistration().get(clientName);
+				registration = clientProperties.getRegistration().get(clientName);
 				clientRegistration = CommonOAuth2Provider.GOOGLE.getBuilder(clientName)
 						.clientId(registration.getClientId())
 						.clientSecret(registration.getClientSecret())
@@ -78,13 +83,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 						.scope("email", "profile")
 						.build();
 				break;
+			case "taeu" :
+				registration = clientProperties.getRegistration().get(clientName);
+				clientRegistration = CustomOAuth2Provider.TAEU.getBuilder(clientName)
+						.clientId(registration.getClientId())
+						.clientSecret(registration.getClientSecret())
+						.redirectUriTemplate(registration.getRedirectUri())
+						.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+						.scope("profile")
+						.build();
+				break;
 		}
 		
 		return clientRegistration;
 	}
 	
 	@Bean
-	public AuthorizationRequestRepository<OAuth2AuthorizationRequest> customAuthorizationRequestRepository() {
+	public AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository() {
 		return new HttpSessionOAuth2AuthorizationRequestRepository();
 	}
 	
@@ -92,6 +107,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> accessTokenResponseClient() {
 		//return new NimbusAuthorizationCodeTokenResponseClient();
 		return new DefaultAuthorizationCodeTokenResponseClient();
+	}
+	
+	@Bean
+	public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService() {
+		return new DefaultOAuth2UserService();
 	}
 	
 	/*
@@ -106,18 +126,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/member/", "/member/signup", "/member/signin/**").permitAll()
 				.anyRequest().authenticated() // 모든요청은 인가되어야함.
 			.and()
+				.formLogin()
+					.loginPage("/member/signin")
+			.and()
 				.exceptionHandling()
 					.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/member/signin")) //login page 정의
 			.and()
 				.oauth2Login()
 					.authorizationEndpoint()
 						.baseUri("/member/oauth2/authorize") //OAuth2 인가서버들의 baseuri설정 default:/login/oauth2/code/
-						.authorizationRequestRepository(customAuthorizationRequestRepository())
+						.authorizationRequestRepository(authorizationRequestRepository())
 				.and()
 					.tokenEndpoint()
 						.accessTokenResponseClient(accessTokenResponseClient()) //tokenEndpoint(code로 token 받아오는..)
 				.and()
 					.userInfoEndpoint()	//token으로  userinfo 받아옴
+						.userService(oauth2UserService())
 				.and()
 					.defaultSuccessUrl("/member/signsuccess")
 			.and()	

@@ -33,6 +33,9 @@ public class Member {
 	
 	@Embedded
 	private Password password;
+
+	@Column(name="SOCIAL_ID")
+	private String socialId;
 	
 	@Column(name="ROLE", nullable=false)
 	@Enumerated(EnumType.STRING)
