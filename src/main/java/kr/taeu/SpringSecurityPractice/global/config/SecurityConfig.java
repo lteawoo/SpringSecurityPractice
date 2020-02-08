@@ -134,7 +134,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.and()
 				.oauth2Login()
 					.authorizationEndpoint()
-						.baseUri("/member/oauth2/authorize") //OAuth2 인가서버들의 baseuri설정 default:/login/oauth2/code/
+						.baseUri("/member/signin/oauth2/authorize") //OAuth2 인가서버들의 baseuri설정 default:/login/oauth2/code/
 						.authorizationRequestRepository(authorizationRequestRepository())
 				.and()
 					.tokenEndpoint()
