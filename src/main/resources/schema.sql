@@ -56,7 +56,7 @@ INSERT INTO oauth_client_details
 VALUES
     ('taeuClient', null, 'taeuSecret',
     'profile', 'authorization_code',
-    'http://localhost:8080/oauth2/code/taeu',
+    'http://localhost:8080/member/signin/oauth2/code/taeu',
     null, 30000, -1, null, 'false');
 				
 				

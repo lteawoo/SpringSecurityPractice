@@ -123,7 +123,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests()
 				//페이지 권한 설정
 				.antMatchers("/oauth/**").permitAll()
-				.antMatchers("/member/", "/member/signup", "/member/signin/**").permitAll()
+				.antMatchers("/member/**", "/member/signup", "/member/signin/**").permitAll()
 				.anyRequest().authenticated() // 모든요청은 인가되어야함.
 			.and()
 				.formLogin()
@@ -133,15 +133,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 					.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/member/signin")) //login page 정의
 			.and()
 				.oauth2Login()
+					.loginProcessingUrl("/member/signin/oauth2/code/*")
 					.authorizationEndpoint()
-						.baseUri("/member/signin/oauth2/authorize") //OAuth2 인가서버들의 baseuri설정 default:/login/oauth2/code/
-						.authorizationRequestRepository(authorizationRequestRepository())
+						.baseUri("/member/signin/oauth2/authorization") //OAuth2 인가서버들의 baseuri설정 default:/login/oauth2/authorization/
+						.authorizationRequestRepository(this.authorizationRequestRepository())
+				.and()
+					.redirectionEndpoint() //redirection endpoint 설정 default: /login/oauth2/code/*
+						//.baseUri("/member/signin/oauth2/code")
 				.and()
 					.tokenEndpoint()
-						.accessTokenResponseClient(accessTokenResponseClient()) //tokenEndpoint(code로 token 받아오는..)
+						.accessTokenResponseClient(this.accessTokenResponseClient()) //tokenEndpoint(code로 token 받아오는..)
 				.and()
 					.userInfoEndpoint()	//token으로  userinfo 받아옴
-						.userService(oauth2UserService())
+						.userService(this.oauth2UserService())
 				.and()
 					.defaultSuccessUrl("/member/signsuccess")
 			.and()	

@@ -96,7 +96,8 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
 		endpoints.accessTokenConverter(accessTokenConverter())
 			.userDetailsService(memberService)
-			.approvalStore(approvalStore());
+			.approvalStore(approvalStore())
+			.tokenStore(tokenStore());
 			//.pathMapping("/oauth/authorize", "/oauth2/authorize")
 			//.pathMapping("/oauth/token", "/oauth2/token");
 	}
