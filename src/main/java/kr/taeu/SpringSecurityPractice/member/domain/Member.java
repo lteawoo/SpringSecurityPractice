@@ -14,6 +14,7 @@ import javax.validation.constraints.NotNull;
 import kr.taeu.SpringSecurityPractice.member.domain.model.Email;
 import kr.taeu.SpringSecurityPractice.member.domain.model.Password;
 import kr.taeu.SpringSecurityPractice.member.domain.model.Role;
+import kr.taeu.SpringSecurityPractice.member.domain.model.SignUpType;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,8 +35,9 @@ public class Member {
 	@Embedded
 	private Password password;
 
-	@Column(name="SOCIAL_ID")
-	private String socialId;
+	@Column(name="SIGN_UP_TP")
+	@Enumerated(EnumType.STRING)
+	private SignUpType signUpType;
 	
 	@Column(name="ROLE", nullable=false)
 	@Enumerated(EnumType.STRING)
@@ -43,9 +45,10 @@ public class Member {
 	private Role role;
 	
 	@Builder
-	public Member(Email email, Password password, Role role) {
+	public Member(Email email, Password password, Role role, SignUpType signUpType) {
 		this.email = email;
 		this.password = password;
 		this.role = role;
+		this.signUpType = signUpType;
 	}
 }

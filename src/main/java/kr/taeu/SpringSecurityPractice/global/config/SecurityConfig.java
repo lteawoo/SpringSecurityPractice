@@ -12,15 +12,12 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
-import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
@@ -31,20 +28,15 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
 import kr.taeu.SpringSecurityPractice.global.security.oauth2.client.CustomOAuth2Provider;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @EnableConfigurationProperties(OAuth2ClientProperties.class)
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-	/*
-	 * 스프링 시큐리티 암호화 알고리즘 Bean 등록
-	 */
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		//return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-		return NoOpPasswordEncoder.getInstance();
-	}
+	private final OAuth2UserService<OAuth2UserRequest, OAuth2User> customOAuth2UserSerivce;
 	
 	/*
 	 * 인증되지 않은 요청에 대한 행동을 정의 하는 Bean 등록
@@ -109,10 +101,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		return new DefaultAuthorizationCodeTokenResponseClient();
 	}
 	
-	@Bean
-	public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService() {
-		return new DefaultOAuth2UserService();
-	}
 	
 	/*
 	 * 스프링 시큐리티 룰 설정
@@ -123,31 +111,27 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests()
 				//페이지 권한 설정
 				.antMatchers("/oauth/**").permitAll()
-				.antMatchers("/member/**", "/member/signup", "/member/signin/**").permitAll()
+				.antMatchers("/member/signup", "/member/signin/**").permitAll()
 				.anyRequest().authenticated() // 모든요청은 인가되어야함.
-			.and()
-				.formLogin()
-					.loginPage("/member/signin")
 			.and()
 				.exceptionHandling()
 					.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/member/signin")) //login page 정의
 			.and()
 				.oauth2Login()
-					.loginProcessingUrl("/member/signin/oauth2/code/*")
+					//.loginProcessingUrl("/member/signin/oauth2/code/*")
 					.authorizationEndpoint()
 						.baseUri("/member/signin/oauth2/authorization") //OAuth2 인가서버들의 baseuri설정 default:/login/oauth2/authorization/
 						.authorizationRequestRepository(this.authorizationRequestRepository())
 				.and()
 					.redirectionEndpoint() //redirection endpoint 설정 default: /login/oauth2/code/*
-						//.baseUri("/member/signin/oauth2/code")
+						.baseUri("/member/signin/oauth2/code/*")
 				.and()
 					.tokenEndpoint()
 						.accessTokenResponseClient(this.accessTokenResponseClient()) //tokenEndpoint(code로 token 받아오는..)
 				.and()
 					.userInfoEndpoint()	//token으로  userinfo 받아옴
-						.userService(this.oauth2UserService())
+						.userService(this.customOAuth2UserSerivce)
 				.and()
-					.defaultSuccessUrl("/member/signsuccess")
 			.and()	
 				.csrf()
 					.disable();
