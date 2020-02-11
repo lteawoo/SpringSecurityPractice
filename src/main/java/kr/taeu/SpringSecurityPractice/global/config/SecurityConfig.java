@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -82,7 +83,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 						.clientId(registration.getClientId())
 						.clientSecret(registration.getClientSecret())
 						.redirectUriTemplate(registration.getRedirectUri())
-						.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+						.authorizationGrantType(new AuthorizationGrantType(registration.getAuthorizationGrantType()))
 						.scope("profile")
 						.build();
 				break;
@@ -124,13 +125,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 					.clearAuthentication(true)
 			.and()
 				.formLogin()
-					.loginPage("/member/signin")
-					.loginProcessingUrl("/member/signin")
-					.defaultSuccessUrl("/member/signsuccess")
-			.and()
+					.disable()
+//					.loginPage("/member/signin")
+//					.loginProcessingUrl("/member/signin")
+//					.defaultSuccessUrl("/member/signsuccess")
+//			.and()
 				.oauth2Login()
 					.loginPage("/member/signin")
-					//.loginProcessingUrl("/member/signin/oauth2/code/*")
+//					.loginProcessingUrl("/member/signin/oauth2/code/*")
 					.authorizationEndpoint()
 						.baseUri("/member/signin/oauth2/authorization") //OAuth2 인가서버들의 baseuri설정 default:/login/oauth2/authorization/
 						.authorizationRequestRepository(this.authorizationRequestRepository())
