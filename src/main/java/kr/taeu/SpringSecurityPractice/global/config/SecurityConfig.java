@@ -112,15 +112,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests()
 				//페이지 권한 설정
 				.antMatchers("/oauth/**").permitAll()
-				.antMatchers("/member/signup", "/member/signin/**").permitAll()
+				//.antMatchers("/member/signup", "/member/signin/**").permitAll()
+				.antMatchers("/member/signup", "/member/signin/**").anonymous() //가입, 로그인은 익명만 가능
 				.anyRequest().authenticated() // 모든요청은 인가되어야함.
 			.and()
 				.exceptionHandling()
 					.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/member/signin"))
 			.and()
+				.logout()
+					.logoutUrl("/member/signout")
+					.clearAuthentication(true)
+			.and()
 				.formLogin()
 					.loginPage("/member/signin")
 					.loginProcessingUrl("/member/signin")
+					.defaultSuccessUrl("/member/signsuccess")
 			.and()
 				.oauth2Login()
 					.loginPage("/member/signin")
@@ -138,6 +144,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 					.userInfoEndpoint()	//token으로  userinfo 받아옴
 						.userService(this.customOAuth2UserSerivce)
 				.and()
+					.defaultSuccessUrl("/member/signsuccess")
 			.and()	
 				.csrf()
 					.disable();
