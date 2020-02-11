@@ -48,6 +48,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	/*
 	 * Client Repository 등록
+	 * 내부적으로 client 정보를 가지고 있어야하는데 inmemory로 관리하자.
 	 */
 	@Bean
 	public ClientRegistrationRepository clientRegistrationRepository(OAuth2ClientProperties clientProperties) {
@@ -115,9 +116,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.anyRequest().authenticated() // 모든요청은 인가되어야함.
 			.and()
 				.exceptionHandling()
-					.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/member/signin")) //login page 정의
+					.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/member/signin"))
+			.and()
+				.formLogin()
+					.loginPage("/member/signin")
+					.loginProcessingUrl("/member/signin")
 			.and()
 				.oauth2Login()
+					.loginPage("/member/signin")
 					//.loginProcessingUrl("/member/signin/oauth2/code/*")
 					.authorizationEndpoint()
 						.baseUri("/member/signin/oauth2/authorization") //OAuth2 인가서버들의 baseuri설정 default:/login/oauth2/authorization/
