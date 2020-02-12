@@ -7,12 +7,14 @@ import java.util.stream.Collectors;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProvider;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
@@ -22,7 +24,9 @@ import org.springframework.security.oauth2.client.registration.InMemoryClientReg
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
+import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -103,6 +107,27 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		return new DefaultAuthorizationCodeTokenResponseClient();
 	}
 	
+	@Bean
+	public OAuth2AuthorizedClientManager authorizedClientManager(
+	        ClientRegistrationRepository clientRegistrationRepository,
+	        OAuth2AuthorizedClientRepository authorizedClientRepository) {
+
+	    OAuth2AuthorizedClientProvider authorizedClientProvider =
+	            OAuth2AuthorizedClientProviderBuilder.builder()
+	                    .authorizationCode()
+	                    .refreshToken()
+	                    .clientCredentials()
+	                    .password()
+	                    .build();
+
+	    DefaultOAuth2AuthorizedClientManager authorizedClientManager =
+	            new DefaultOAuth2AuthorizedClientManager(
+	                    clientRegistrationRepository, authorizedClientRepository);
+	    authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
+
+	    return authorizedClientManager;
+	}
+	
 	
 	/*
 	 * 스프링 시큐리티 룰 설정
@@ -129,7 +154,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //					.loginPage("/member/signin")
 //					.loginProcessingUrl("/member/signin")
 //					.defaultSuccessUrl("/member/signsuccess")
-//			.and()
+				.oauth2Client()
+					.authorizationCodeGrant()
+				.and()
+			.and()
 				.oauth2Login()
 					.loginPage("/member/signin")
 //					.loginProcessingUrl("/member/signin/oauth2/code/*")

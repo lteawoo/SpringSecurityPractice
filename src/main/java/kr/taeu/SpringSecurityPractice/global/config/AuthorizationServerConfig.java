@@ -4,10 +4,14 @@ import javax.sql.DataSource;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProvider;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
@@ -17,7 +21,6 @@ import org.springframework.security.oauth2.provider.approval.JdbcApprovalStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
-import kr.taeu.SpringSecurityPractice.global.security.service.AuthenticationProviderImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,11 +37,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	private final DataSource dataSource;
 	private final PasswordEncoder passwordEncoder;
 	private final UserDetailsService memberService;
-	
-//	@Bean
-//	public ClientDetailsService clientDetailsService(DataSource dataSource) {
-//		return new JdbcClientDetailsService(dataSource);
-//	}
+//	private final AuthenticationManager authenticationManager;
 	
 	/*
 	 * jwt 인증키 설정
@@ -64,6 +63,33 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	public JdbcApprovalStore approvalStore() {
 		return new JdbcApprovalStore(dataSource);
 	}
+	
+//	@Bean
+//	public ClientDetailsService clientDetailsService(DataSource dataSource) {
+//		return new JdbcClientDetailsService(dataSource);
+//	}
+	
+//	@Bean
+//	public OAuth2AuthorizedClientManager authorizedClientManager(
+//	        ClientRegistrationRepository clientRegistrationRepository,
+//	        OAuth2AuthorizedClientRepository authorizedClientRepository) {
+//
+//	    OAuth2AuthorizedClientProvider authorizedClientProvider =
+//	            OAuth2AuthorizedClientProviderBuilder.builder()
+//	                    .password()
+//	                    .build();
+//
+//	    DefaultOAuth2AuthorizedClientManager authorizedClientManager =
+//	            new DefaultOAuth2AuthorizedClientManager(
+//	                    clientRegistrationRepository, authorizedClientRepository);
+//	    authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
+//
+//	    // Assuming the `username` and `password` are supplied as `HttpServletRequest` parameters,
+//	    // map the `HttpServletRequest` parameters to `OAuth2AuthorizationContext.getAttributes()`
+//	    //authorizedClientManager.setContextAttributesMapper(contextAttributesMapper());
+//
+//	    return authorizedClientManager;
+//	}
 
 	/*
      * Client 설정
@@ -102,6 +128,8 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 			.userDetailsService(memberService)
 			.approvalStore(approvalStore())
 			.tokenStore(tokenStore());
+//			.tokenGranter(new CompositeTokenGranter(getDefaultTokenGranter(endpoints.getClientDetailsService(), endpoints.getTokenServices()
+//				, endpoints.getAuthorizationCodeServices(), endpoints.getOAuth2RequestFactory())));
 			//.pathMapping("/oauth/authorize", "/oauth2/authorize")
 			//.pathMapping("/oauth/token", "/oauth2/token");
 	}
@@ -115,4 +143,25 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 			.tokenKeyAccess("permitAll()") // allow check token
 			.checkTokenAccess("isAuthenticated()");
 	}
+	
+//	private List<TokenGranter> getDefaultTokenGranter(ClientDetailsService clientDetails, AuthorizationServerTokenServices tokenServices
+//			, AuthorizationCodeServices authorizationCodeServices, OAuth2RequestFactory requestFactory) {
+////		ClientDetailsService clientDetails = this.clientDetailsService;
+////		AuthorizationServerTokenServices tokenServices = tokenServices();
+////		AuthorizationCodeServices authorizationCodeServices = authorizationCodeServices();
+////		OAuth2RequestFactory requestFactory = requestFactory();
+//
+//		List<TokenGranter> tokenGranters = new ArrayList<TokenGranter>();
+//		tokenGranters.add(new AuthorizationCodeTokenGranter(tokenServices, authorizationCodeServices, clientDetails,
+//				requestFactory));
+//		tokenGranters.add(new RefreshTokenGranter(tokenServices, clientDetails, requestFactory));
+//		ImplicitTokenGranter implicit = new ImplicitTokenGranter(tokenServices, clientDetails, requestFactory);
+//		tokenGranters.add(implicit);
+//		tokenGranters.add(new ClientCredentialsTokenGranter(tokenServices, clientDetails, requestFactory));
+//		if (this.authenticationManager != null) {
+//			tokenGranters.add(new ResourceOwnerPasswordTokenGranter(this.authenticationManager, tokenServices,
+//					clientDetails, requestFactory));
+//		}
+//		return tokenGranters;
+//	}
 }
