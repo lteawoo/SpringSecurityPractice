@@ -6,7 +6,7 @@
 
 <script type="text/javascript" th:src="@{/js/jquery-3.4.1.min.js}"></script>
 <script type="text/javascript">
-	$.fn.serializeArrayToJson = function() {
+	$.fn.serializeToArray = function() {
 		var returnArray = {};
 		var serializeArray = this.serializeArray();
 		
@@ -21,7 +21,7 @@
 			event.preventDefault();
 			// serialize는 form의 <input> 요소들의 name이 배열형태로 그 값이 인코딩되어 URL query string으로 하는 메서드
 			//let queryString = $(this).serialize();
-			var jsonData = JSON.stringify($(this).serializeArrayToJson());
+			var jsonData = JSON.stringify($(this).serializeToArray());
 			console.log(jsonData);
 			$.ajax({
 				url: "/member/signup",

@@ -2,16 +2,14 @@ package kr.taeu.SpringSecurityPractice.global.config;
 
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProvider;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizedClientManager;
-import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
@@ -37,7 +35,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	private final DataSource dataSource;
 	private final PasswordEncoder passwordEncoder;
 	private final UserDetailsService memberService;
-//	private final AuthenticationManager authenticationManager;
+	private final AuthenticationManager authenticationManager;
 	
 	/*
 	 * jwt 인증키 설정
@@ -124,10 +122,11 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	 */
 	@Override
 	public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-		endpoints.accessTokenConverter(accessTokenConverter())
-			.userDetailsService(memberService)
-			.approvalStore(approvalStore())
-			.tokenStore(tokenStore());
+		endpoints.accessTokenConverter(this.accessTokenConverter())
+			.userDetailsService(this.memberService)
+			.approvalStore(this.approvalStore())
+			.tokenStore(this.tokenStore())
+			.authenticationManager(this.authenticationManager);
 //			.tokenGranter(new CompositeTokenGranter(getDefaultTokenGranter(endpoints.getClientDetailsService(), endpoints.getTokenServices()
 //				, endpoints.getAuthorizationCodeServices(), endpoints.getOAuth2RequestFactory())));
 			//.pathMapping("/oauth/authorize", "/oauth2/authorize")
