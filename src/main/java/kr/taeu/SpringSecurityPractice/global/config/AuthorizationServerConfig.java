@@ -2,12 +2,9 @@ package kr.taeu.SpringSecurityPractice.global.config;
 
 import javax.sql.DataSource;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
@@ -34,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
 	private final DataSource dataSource;
 	private final PasswordEncoder passwordEncoder;
-	private final UserDetailsService memberService;
+	private final UserDetailsService memberDetailsService;
 	private final AuthenticationManager authenticationManager;
 	
 	/*
@@ -123,7 +120,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	@Override
 	public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
 		endpoints.accessTokenConverter(this.accessTokenConverter())
-			.userDetailsService(this.memberService)
+			.userDetailsService(this.memberDetailsService)
 			.approvalStore(this.approvalStore())
 			.tokenStore(this.tokenStore())
 			.authenticationManager(this.authenticationManager);

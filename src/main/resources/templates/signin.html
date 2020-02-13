@@ -43,7 +43,7 @@
 		console.log(result);
 		
 		$.ajax({
-			url: "/member/signsuccess",
+			url: "/member/resource/signsuccess",
 			type: "GET",
 			headers: {'Authorization': 'bearer ' + result.access_token},
 			dataType : 'text',

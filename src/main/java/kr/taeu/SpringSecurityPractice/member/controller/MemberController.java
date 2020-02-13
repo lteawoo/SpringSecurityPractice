@@ -2,8 +2,6 @@ package kr.taeu.SpringSecurityPractice.member.controller;
 
 import javax.validation.Valid;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,11 +9,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
 
 import kr.taeu.SpringSecurityPractice.member.dto.MemberResponse;
 import kr.taeu.SpringSecurityPractice.member.dto.SignUpRequest;
-import kr.taeu.SpringSecurityPractice.member.service.MemberService;
+import kr.taeu.SpringSecurityPractice.member.service.MemberDetailsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,41 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @Controller
 @RequiredArgsConstructor
 public class MemberController {
-	private final OAuth2AuthorizedClientService authorizedClientService;
-	private final MemberService memberService;
-	
-	@GetMapping(value = "/")
-	@ResponseBody
-	public String helloWorld() {
-		return "hello";
-	}
-	
-//	@GetMapping(value = "/signsuccess")
-//	public String signSuccess(Model model, Authentication authentication) {
-//		OAuth2AuthorizedClient client = authorizedClientService.loadAuthorizedClient(authentication.getAuthorizedClientRegistrationId(), authentication.getName());
-//		
-//		String userInfoEndpointUri = client.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUri();
-//		
-//		if(!StringUtils.isEmpty(userInfoEndpointUri)) {
-//			RestTemplate restTemplate = new RestTemplate();
-//			HttpHeaders headers = new HttpHeaders();
-//			
-//			headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + client.getAccessToken().getTokenValue());
-//			HttpEntity entity = new HttpEntity("", headers);
-//			ResponseEntity<Map> response = restTemplate.exchange(userInfoEndpointUri, HttpMethod.GET, entity, Map.class);
-//			Map userAttributes = response.getBody();
-//			
-//			model.addAttribute("name", userAttributes.get("name"));
-//		}
-//		model.addAttribute("name", authentication.getName());
-//		return "signsuccess";
-//	}
-	
-	@GetMapping(value = "/signsuccess")
-	@ResponseBody
-	public String signSuccess(Authentication authentication) {
-		return authentication.getPrincipal().toString();
-	}
+	private final MemberDetailsService memberDetailsService;
 	
 	@GetMapping(value = "/signup")
 	public String signUp(Model model) {
@@ -68,11 +31,11 @@ public class MemberController {
 	@PostMapping(value = "/signup")
 	@ResponseBody
 	public MemberResponse signUp(@RequestBody @Valid final SignUpRequest signUpRequest) {
-		return new MemberResponse(memberService.signUp(signUpRequest));
+		return new MemberResponse(memberDetailsService.signUp(signUpRequest));
 	}
 	
 	@GetMapping(value = "/signin")
-	public ModelAndView signIn() {
-		return new ModelAndView("signin");
+	public String signIn(Model model) {
+		return "signin";
 	}
 }

@@ -8,12 +8,10 @@ import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2Clien
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
@@ -115,44 +113,43 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests()
 				//페이지 권한 설정
 				//.antMatchers("/oauth/**").permitAll()
-				//.antMatchers("/member/signup", "/member/signin/**").anonymous() //가입, 로그인은 익명만 가능
+				.antMatchers("/member/signup", "/member/signin").anonymous()
 				/*
 				 * UserDeatils 관련 서비스는 Resource Server에서 담당해야 맞다.
 				 */
 				//.anyRequest().authenticated() // 모든요청은 인가되어야함.
-			.and()
-				.exceptionHandling()
-					.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/member/signin"))
-			.and()
-				.logout()
-					.logoutUrl("/member/signout")
-					.clearAuthentication(true)
-			.and()
-				.formLogin()
-					.disable()
-				/*
-				 * Authorization Code Grant를 위한 설정
-				 */
-				.oauth2Login()
-					.loginPage("/member/signin")
+		.and()
+			.exceptionHandling()
+				.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/member/signin"))
+		.and()
+			.logout()
+				.logoutUrl("/member/signout")
+				.clearAuthentication(true)
+		.and()
+			.formLogin()
+				.disable()
+			/*
+			 * Authorization Code Grant를 위한 설정
+			 */
+			.oauth2Login()
+				.loginPage("/member/signin")
 //					.loginProcessingUrl("/member/signin/oauth2/code/*")
-					.authorizationEndpoint()
-						.baseUri("/member/signin/oauth2/authorization") //OAuth2 인가서버들의 baseuri설정 default:/login/oauth2/authorization/
-						.authorizationRequestRepository(this.authorizationRequestRepository())
-				.and()
-					.redirectionEndpoint() //redirection endpoint 설정 default: /login/oauth2/code/*
-						.baseUri("/member/signin/oauth2/code/*")
-				.and()
-					.tokenEndpoint()
-						.accessTokenResponseClient(this.accessTokenResponseClient()) //tokenEndpoint(code로 token 받아오는..)
-				.and()
-					.userInfoEndpoint()	//token으로  userinfo 받아옴
-						.userService(this.customOAuth2UserSerivce)
-				.and()
-					.defaultSuccessUrl("/member/signsuccess")
-			.and()	
-				.csrf()
-					.disable();
+				.authorizationEndpoint()
+					.baseUri("/member/signin/oauth2/authorization") //OAuth2 인가서버들의 baseuri설정 default:/login/oauth2/authorization/
+					.authorizationRequestRepository(this.authorizationRequestRepository())
+			.and()
+				.redirectionEndpoint() //redirection endpoint 설정 default: /login/oauth2/code/*
+					.baseUri("/member/signin/oauth2/code/*")
+			.and()
+				.tokenEndpoint()
+					.accessTokenResponseClient(this.accessTokenResponseClient()) //tokenEndpoint(code로 token 받아오는..)
+			.and()
+				.userInfoEndpoint()	//token으로  userinfo 받아옴
+					.userService(this.customOAuth2UserSerivce)
+			.and()
+		.and()	
+			.csrf()
+				.disable();
 	}
 
 	/*
