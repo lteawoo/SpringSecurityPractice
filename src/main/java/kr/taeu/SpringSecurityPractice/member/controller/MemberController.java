@@ -33,8 +33,8 @@ public class MemberController {
 		return "hello";
 	}
 	
-	@GetMapping(value = "/signsuccess")
-	public String signSuccess(Model model, Authentication authentication) {
+//	@GetMapping(value = "/signsuccess")
+//	public String signSuccess(Model model, Authentication authentication) {
 //		OAuth2AuthorizedClient client = authorizedClientService.loadAuthorizedClient(authentication.getAuthorizedClientRegistrationId(), authentication.getName());
 //		
 //		String userInfoEndpointUri = client.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUri();
@@ -50,8 +50,14 @@ public class MemberController {
 //			
 //			model.addAttribute("name", userAttributes.get("name"));
 //		}
-		model.addAttribute("name", authentication.getName());
-		return "signsuccess";
+//		model.addAttribute("name", authentication.getName());
+//		return "signsuccess";
+//	}
+	
+	@GetMapping(value = "/signsuccess")
+	@ResponseBody
+	public String signSuccess(Authentication authentication) {
+		return authentication.getPrincipal().toString();
 	}
 	
 	@GetMapping(value = "/signup")

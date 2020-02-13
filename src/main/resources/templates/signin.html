@@ -30,7 +30,7 @@
 				contentType: "application/x-www-form-urlencoded",
 				data: data,
 				success: function(result) {
-					$("#result").html(result.access_token + ", " + result.refresh_token + ", " + result.expires_in);
+					success(result);
 				},
 				error: function(result) {
 					$("#result").html(result.responseText);
@@ -38,6 +38,23 @@
 			});
 		});
 	})
+	
+	function success(result) {
+		console.log(result);
+		
+		$.ajax({
+			url: "/member/signsuccess",
+			type: "GET",
+			headers: {'Authorization': 'bearer ' + result.access_token},
+			dataType : 'text',
+			success: function(result) {
+				$("#result").html(result);
+			},
+			error: function(result) {
+				$("#result").html(result.responseText);
+			}
+		});
+	}
 </script>
 </head>
 <body>

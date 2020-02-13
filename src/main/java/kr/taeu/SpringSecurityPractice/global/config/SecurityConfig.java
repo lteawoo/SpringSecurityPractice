@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
@@ -39,14 +40,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	private final OAuth2UserService<OAuth2UserRequest, OAuth2User> customOAuth2UserSerivce;
-	
-	/*
-	 * 인증되지 않은 요청에 대한 행동을 정의 하는 Bean 등록
-	 */
-//	@Bean
-//	public AuthenticationEntryPoint authenticationEntryPoint() {
-//		return new RestAuthenticationEntryPoint();
-//	}
 	
 	/*
 	 * Client Repository 등록
@@ -104,37 +97,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		return new DefaultAuthorizationCodeTokenResponseClient();
 	}
 	
-//	@Bean
-//	public OAuth2AuthorizedClientManager authorizedClientManager(
-//	        ClientRegistrationRepository clientRegistrationRepository,
-//	        OAuth2AuthorizedClientRepository authorizedClientRepository) {
-//
-//	    OAuth2AuthorizedClientProvider authorizedClientProvider =
-//	            OAuth2AuthorizedClientProviderBuilder.builder()
-//	                    .authorizationCode()
-//	                    .refreshToken()
-//	                    .clientCredentials()
-//	                    .password()
-//	                    .build();
-//
-//	    DefaultOAuth2AuthorizedClientManager authorizedClientManager =
-//	            new DefaultOAuth2AuthorizedClientManager(
-//	                    clientRegistrationRepository, authorizedClientRepository);
-//	    authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
-//
-//	    return authorizedClientManager;
-//	}
-	
+	/*
+	 * Resource Owner Password Grant를 위한 Authentication Manager 등록
+	 */
 	@Bean
     @Override
     protected AuthenticationManager authenticationManager() throws Exception {
         return super.authenticationManager();
     }
-	
-//	@Override
-//	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//		auth.authenticationProvider(authenticationProvider)
-//	}
 	
 	/*
 	 * 스프링 시큐리티 룰 설정
@@ -144,10 +114,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		log.info("HttpSecurity config...");
 		http.authorizeRequests()
 				//페이지 권한 설정
-				.antMatchers("/oauth/**").permitAll()
-				//.antMatchers("/member/signup", "/member/signin/**").permitAll()
-				.antMatchers("/member/signup", "/member/signin/**").anonymous() //가입, 로그인은 익명만 가능
-				.anyRequest().authenticated() // 모든요청은 인가되어야함.
+				//.antMatchers("/oauth/**").permitAll()
+				//.antMatchers("/member/signup", "/member/signin/**").anonymous() //가입, 로그인은 익명만 가능
+				/*
+				 * UserDeatils 관련 서비스는 Resource Server에서 담당해야 맞다.
+				 */
+				//.anyRequest().authenticated() // 모든요청은 인가되어야함.
 			.and()
 				.exceptionHandling()
 					.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/member/signin"))
@@ -158,13 +130,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.and()
 				.formLogin()
 					.disable()
-//					.loginPage("/member/signin")
-//					.loginProcessingUrl("/member/signin")
-//					.defaultSuccessUrl("/member/signsuccess")
-				.oauth2Client()
-					.authorizationCodeGrant()
-				.and()
-			.and()
+				/*
+				 * Authorization Code Grant를 위한 설정
+				 */
 				.oauth2Login()
 					.loginPage("/member/signin")
 //					.loginProcessingUrl("/member/signin/oauth2/code/*")
