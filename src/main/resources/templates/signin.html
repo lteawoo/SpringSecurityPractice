@@ -48,7 +48,9 @@
 			headers: {'Authorization': 'bearer ' + result.access_token},
 			dataType : 'text',
 			success: function(result) {
-				$("#result").html(result);
+				//$("#result").html(result);
+				console.log(result);
+				window.location.href = "/member"
 			},
 			error: function(result) {
 				$("#result").html(result.responseText);
