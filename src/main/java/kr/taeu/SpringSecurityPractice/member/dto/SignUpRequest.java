@@ -6,6 +6,7 @@ import kr.taeu.SpringSecurityPractice.member.domain.Member;
 import kr.taeu.SpringSecurityPractice.member.domain.model.Email;
 import kr.taeu.SpringSecurityPractice.member.domain.model.Password;
 import kr.taeu.SpringSecurityPractice.member.domain.model.Role;
+import kr.taeu.SpringSecurityPractice.member.domain.model.SocialType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

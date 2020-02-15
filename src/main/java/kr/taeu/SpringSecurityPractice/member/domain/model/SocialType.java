@@ -3,11 +3,10 @@ package kr.taeu.SpringSecurityPractice.member.domain.model;
 import lombok.Getter;
 
 @Getter
-public enum SignUpType {
-	GOOGLE("GOOGLE"),
-	TAEU("TAEU");
+public enum SocialType {
+	GOOGLE("GOOGLE");
 	
-	SignUpType(String value) {
+	SocialType(String value) {
 		this.value = value;
 	}
 	

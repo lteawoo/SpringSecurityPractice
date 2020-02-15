@@ -14,7 +14,7 @@ import kr.taeu.SpringSecurityPractice.member.domain.Member;
 import kr.taeu.SpringSecurityPractice.member.domain.model.Email;
 import kr.taeu.SpringSecurityPractice.member.domain.model.Password;
 import kr.taeu.SpringSecurityPractice.member.domain.model.Role;
-import kr.taeu.SpringSecurityPractice.member.domain.model.SignUpType;
+import kr.taeu.SpringSecurityPractice.member.domain.model.SocialType;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -39,7 +39,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 		Member member = optMember.orElseGet(() -> {
 			Member newMember = Member.builder()
 					.email(email)
-					.signUpType(SignUpType.GOOGLE)
+					.signUpType(SocialType.GOOGLE)
 					.password(new Password(passwordEncoder.encode("12345")))
 					.role(Role.MEMBER)
 					.build();

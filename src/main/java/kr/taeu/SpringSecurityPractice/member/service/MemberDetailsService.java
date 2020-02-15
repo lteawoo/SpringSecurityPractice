@@ -18,6 +18,7 @@ import kr.taeu.SpringSecurityPractice.member.dao.MemberRepository;
 import kr.taeu.SpringSecurityPractice.member.domain.Member;
 import kr.taeu.SpringSecurityPractice.member.domain.model.Email;
 import kr.taeu.SpringSecurityPractice.member.domain.model.Password;
+import kr.taeu.SpringSecurityPractice.member.domain.model.SocialType;
 import kr.taeu.SpringSecurityPractice.member.dto.SignUpRequest;
 import lombok.RequiredArgsConstructor;
 
