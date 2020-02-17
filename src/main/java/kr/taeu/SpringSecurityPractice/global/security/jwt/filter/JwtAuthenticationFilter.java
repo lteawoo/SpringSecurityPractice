@@ -31,7 +31,7 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException, IOException, ServletException {
-		String token = request.getHeader("Authorization");
+		String token = request.getHeader("auth-token");
 		
 		if(StringUtils.isEmpty(token)) {
 			throw new AccessDeniedException("Check header : Authorization");

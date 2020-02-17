@@ -1,6 +1,5 @@
 package kr.taeu.SpringSecurityPractice.global.config;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -13,6 +12,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
@@ -27,11 +27,16 @@ import org.springframework.security.oauth2.client.web.HttpSessionOAuth2Authoriza
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import io.swagger.models.HttpMethod;
 import kr.taeu.SpringSecurityPractice.global.security.SkipPathRequestMatcher;
-import kr.taeu.SpringSecurityPractice.global.security.jwt.JwtAuthenticationToken;
+import kr.taeu.SpringSecurityPractice.global.security.ajax.AjaxAuthenticationFailureHandler;
+import kr.taeu.SpringSecurityPractice.global.security.ajax.AjaxAuthenticationSuccessHandler;
+import kr.taeu.SpringSecurityPractice.global.security.ajax.filter.AjaxAuthenticationFilter;
 import kr.taeu.SpringSecurityPractice.global.security.jwt.filter.JwtAuthenticationFilter;
 import kr.taeu.SpringSecurityPractice.global.security.oauth2.client.CustomOAuth2Provider;
 import lombok.RequiredArgsConstructor;
@@ -109,9 +114,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManager();
     }
 	
+	@Bean
+	public AjaxAuthenticationFilter ajaxAuthenticationFilter() throws Exception {
+		AjaxAuthenticationFilter filter = new AjaxAuthenticationFilter(new AntPathRequestMatcher("/member/signin", HttpMethod.POST.name()));
+		filter.setAuthenticationManager(this.authenticationManager());
+		filter.setAuthenticationSuccessHandler(new AjaxAuthenticationSuccessHandler());
+		filter.setAuthenticationFailureHandler(new AjaxAuthenticationFailureHandler());
+		return filter;
+	}
+	
+	@Bean
 	public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-		JwtAuthenticationFilter filter = new JwtAuthenticationFilter(new SkipPathRequestMatcher("/member/signup", "/member/signin"));
-		filter.setAuthenticationManager(authenticationManager());
+		JwtAuthenticationFilter filter = new JwtAuthenticationFilter(new SkipPathRequestMatcher("/member/signup**", "/member/signin**"));
+		filter.setAuthenticationManager(this.authenticationManager());
 		return filter;
 	}
 	
@@ -134,13 +149,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.exceptionHandling()
 				.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/member/signin"))
 		.and()
-			.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+			.addFilterBefore(ajaxAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+			.addFilterBefore(jwtAuthenticationFilter(), FilterSecurityInterceptor.class)
 			.logout()
 				.logoutUrl("/member/signout")
 				.clearAuthentication(true)
 		.and()
 			.formLogin()
-				.disable()
+				.loginPage("/member/signin")
+				.loginProcessingUrl("/member/signin")
+		.and()
+//				.disable()
 			/*
 			 * Authorization Code Grant를 위한 설정
 			 */
@@ -162,7 +181,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.and()
 		.and()
 			.csrf()
-				.disable();
+				.disable()
+			.sessionManagement()
+				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+			
 	}
 
 	/*
