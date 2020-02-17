@@ -44,4 +44,10 @@ public class MemberController {
 	public String signIn(Model model) {
 		return "signin";
 	}
+	
+	@GetMapping(value = "/welcome")
+	@ResponseBody
+	public String welcome() {
+		return "";
+	}
 }

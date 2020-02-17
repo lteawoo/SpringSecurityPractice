@@ -28,6 +28,7 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequ
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
+import kr.taeu.SpringSecurityPractice.global.security.jwt.filter.JwtAuthenticationFilter;
 import kr.taeu.SpringSecurityPractice.global.security.oauth2.client.CustomOAuth2Provider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -104,6 +105,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManager();
     }
 	
+	public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
+		JwtAuthenticationFilter filter = new JwtAuthenticationFilter() ;
+	}
+	
 	/*
 	 * 스프링 시큐리티 룰 설정
 	 */
@@ -147,7 +152,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.userInfoEndpoint()	//token으로  userinfo 받아옴
 					.userService(this.customOAuth2UserSerivce)
 			.and()
-		.and()	
+		.and()
+			.addFilterBefore(filter, beforeFilter)
 			.csrf()
 				.disable();
 	}
