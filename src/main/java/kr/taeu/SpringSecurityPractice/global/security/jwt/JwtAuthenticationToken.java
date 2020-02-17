@@ -1,4 +1,4 @@
-package kr.taeu.SpringSecurityPractice.global.security.jwt.filter;
+package kr.taeu.SpringSecurityPractice.global.security.jwt;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.SpringSecurityCoreVersion;

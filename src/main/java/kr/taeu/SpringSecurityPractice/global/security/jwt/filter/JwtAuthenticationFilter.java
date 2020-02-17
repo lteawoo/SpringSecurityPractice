@@ -16,10 +16,16 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.StringUtils;
 
+import kr.taeu.SpringSecurityPractice.global.security.jwt.JwtAuthenticationToken;
+
 
 public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFilter{
-	protected JwtAuthenticationFilter(RequestMatcher requiresAuthenticationRequestMatcher) {
-		super(requiresAuthenticationRequestMatcher);
+	public JwtAuthenticationFilter(RequestMatcher matcher) {
+		super(matcher);
+	}
+	
+	public JwtAuthenticationFilter(String uri) {
+		super(uri);
 	}
 
 	@Override

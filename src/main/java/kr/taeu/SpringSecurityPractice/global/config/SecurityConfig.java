@@ -1,5 +1,6 @@
 package kr.taeu.SpringSecurityPractice.global.config;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -27,7 +28,10 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import kr.taeu.SpringSecurityPractice.global.security.SkipPathRequestMatcher;
+import kr.taeu.SpringSecurityPractice.global.security.jwt.JwtAuthenticationToken;
 import kr.taeu.SpringSecurityPractice.global.security.jwt.filter.JwtAuthenticationFilter;
 import kr.taeu.SpringSecurityPractice.global.security.oauth2.client.CustomOAuth2Provider;
 import lombok.RequiredArgsConstructor;
@@ -106,7 +110,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 	
 	public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-		JwtAuthenticationFilter filter = new JwtAuthenticationFilter() ;
+		JwtAuthenticationFilter filter = new JwtAuthenticationFilter(new SkipPathRequestMatcher("/member/signup", "/member/signin"));
+		filter.setAuthenticationManager(authenticationManager());
+		return filter;
 	}
 	
 	/*
@@ -118,7 +124,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests()
 				//페이지 권한 설정
 				//.antMatchers("/oauth/**").permitAll()
-				.antMatchers("/member/signup", "/member/signin").anonymous()
+				//.antMatchers("/member/signup", "/member/signin").anonymous()
+				.antMatchers("/member/signup", "/member/signin").permitAll()
 				/*
 				 * UserDeatils 관련 서비스는 Resource Server에서 담당해야 맞다.
 				 */
@@ -127,6 +134,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.exceptionHandling()
 				.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/member/signin"))
 		.and()
+			.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 			.logout()
 				.logoutUrl("/member/signout")
 				.clearAuthentication(true)
@@ -153,7 +161,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 					.userService(this.customOAuth2UserSerivce)
 			.and()
 		.and()
-			.addFilterBefore(filter, beforeFilter)
 			.csrf()
 				.disable();
 	}
