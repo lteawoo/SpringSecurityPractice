@@ -19,12 +19,12 @@ import org.springframework.util.StringUtils;
 import kr.taeu.SpringSecurityPractice.global.security.jwt.JwtAuthenticationToken;
 
 
-public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFilter{
-	public JwtAuthenticationFilter(RequestMatcher matcher) {
+public class JwtAuthorizationFilter extends AbstractAuthenticationProcessingFilter{
+	public JwtAuthorizationFilter(RequestMatcher matcher) {
 		super(matcher);
 	}
 	
-	public JwtAuthenticationFilter(String uri) {
+	public JwtAuthorizationFilter(String uri) {
 		super(uri);
 	}
 
@@ -34,7 +34,7 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 		String token = request.getHeader("auth-token");
 		
 		if(StringUtils.isEmpty(token)) {
-			throw new AccessDeniedException("Check header : Authorization");
+			throw new AccessDeniedException("header does not have token please authentication");
 		} else {
 			return getAuthenticationManager().authenticate(new JwtAuthenticationToken(token));
 		}

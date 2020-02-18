@@ -19,23 +19,22 @@
 		$("#signIn").submit(function(e) {
 			event.preventDefault();
 			
-// 			var data = $(this).serializeToArray();
+			var data = $(this).serializeToArray();
 // 			data["grant_type"] = "password";
-			var data = JSON.stringify($(this).serializeToArray());
+// 			var data = JSON.stringify($(this).serializeToArray());
 			
 			console.log(data);
 			$.ajax({
 // 				url: "/oauth/token",
-// 				type: "POST",
-// 				headers: {'Authorization': 'Basic dGFldUNsaWVudDp0YWV1U2VjcmV0'},
-// 				contentType: "application/x-www-form-urlencoded",
-// 				data: data,
-				url: "/member/signin",
 				type: "POST",
-				contentType: "application/json;charset=UTF-8",
+// 				headers: {'Authorization': 'Basic dGFldUNsaWVudDp0YWV1U2VjcmV0'},
+				contentType: "application/x-www-form-urlencoded",
 				data: data,
+				url: "/member/signin",
+// 				contentType: "application/json;charset=UTF-8",
 				success: function(result) {
-					success(result);
+// 					success(result);
+					$("#result").html(result);
 				},
 				error: function(result) {
 					$("#result").html(result.responseText);
@@ -69,22 +68,22 @@
 <!-- 	<form id="signIn" action="/oauth/token" method="post"> -->
 		<form id="signIn" method="post">
 		<table>
-			<tr>
-				<td>email</td>
-				<td><input type="text" name="email" value="test@taeu.com"/></td>
-			</tr>
-			<tr>
-				<td>password</td>
-				<td><input type="text" name="password" value="12345"/></td>
-			</tr>
 <!-- 			<tr> -->
 <!-- 				<td>email</td> -->
-<!-- 				<td><input type="text" name="username" value="test@taeu.com"/></td> -->
+<!-- 				<td><input type="text" name="email" value="test@taeu.com"/></td> -->
 <!-- 			</tr> -->
 <!-- 			<tr> -->
 <!-- 				<td>password</td> -->
 <!-- 				<td><input type="text" name="password" value="12345"/></td> -->
 <!-- 			</tr> -->
+			<tr>
+				<td>email</td>
+				<td><input type="text" name="username" value="test@taeu.com"/></td>
+			</tr>
+			<tr>
+				<td>password</td>
+				<td><input type="text" name="password" value="12345"/></td>
+			</tr>
 			<tr>
 				<td colspan="2">
 					<button type="submit">로그인</button>

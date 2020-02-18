@@ -34,10 +34,12 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import io.swagger.models.HttpMethod;
 import kr.taeu.SpringSecurityPractice.global.security.SkipPathRequestMatcher;
+import kr.taeu.SpringSecurityPractice.global.security.ajax.AjaxAuthenticationEntryPoint;
 import kr.taeu.SpringSecurityPractice.global.security.ajax.AjaxAuthenticationFailureHandler;
 import kr.taeu.SpringSecurityPractice.global.security.ajax.AjaxAuthenticationSuccessHandler;
+import kr.taeu.SpringSecurityPractice.global.security.ajax.AjaxAuthenticationSuccessHandler;
 import kr.taeu.SpringSecurityPractice.global.security.ajax.filter.AjaxAuthenticationFilter;
-import kr.taeu.SpringSecurityPractice.global.security.jwt.filter.JwtAuthenticationFilter;
+import kr.taeu.SpringSecurityPractice.global.security.jwt.filter.JwtAuthorizationFilter;
 import kr.taeu.SpringSecurityPractice.global.security.oauth2.client.CustomOAuth2Provider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -114,21 +116,27 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManager();
     }
 	
-	@Bean
-	public AjaxAuthenticationFilter ajaxAuthenticationFilter() throws Exception {
-		AjaxAuthenticationFilter filter = new AjaxAuthenticationFilter(new AntPathRequestMatcher("/member/signin", HttpMethod.POST.name()));
-		filter.setAuthenticationManager(this.authenticationManager());
-		filter.setAuthenticationSuccessHandler(new AjaxAuthenticationSuccessHandler());
-		filter.setAuthenticationFailureHandler(new AjaxAuthenticationFailureHandler());
-		return filter;
-	}
+	/*
+	 * Ajax 로그인시 인증 필터
+	 */
+//	@Bean
+//	public AjaxAuthenticationFilter ajaxAuthenticationFilter() throws Exception {
+//		AjaxAuthenticationFilter filter = new AjaxAuthenticationFilter(new AntPathRequestMatcher("/member/signin", HttpMethod.POST.name()));
+//		filter.setAuthenticationManager(this.authenticationManager());
+//		filter.setAuthenticationSuccessHandler(new AjaxAuthenticationSuccessHandler());
+//		filter.setAuthenticationFailureHandler(new AjaxAuthenticationFailureHandler());
+//		return filter;
+//	}
 	
-	@Bean
-	public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-		JwtAuthenticationFilter filter = new JwtAuthenticationFilter(new SkipPathRequestMatcher("/member/signup**", "/member/signin**"));
-		filter.setAuthenticationManager(this.authenticationManager());
-		return filter;
-	}
+	/*
+	 * 로그인 후의 
+	 */
+//	@Bean
+//	public JwtAuthorizationFilter jwtAuthorizationFilter() throws Exception {
+//		JwtAuthorizationFilter filter = new JwtAuthorizationFilter(new SkipPathRequestMatcher("/member/signup**", "/member/signin**"));
+//		filter.setAuthenticationManager(this.authenticationManager());
+//		return filter;
+//	}
 	
 	/*
 	 * 스프링 시큐리티 룰 설정
@@ -139,18 +147,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests()
 				//페이지 권한 설정
 				//.antMatchers("/oauth/**").permitAll()
-				//.antMatchers("/member/signup", "/member/signin").anonymous()
-				.antMatchers("/member/signup", "/member/signin").permitAll()
+				.antMatchers("/member/signup**", "/member/signin**").anonymous()
+//				.antMatchers("/member/signup**", "/member/signin**").permitAll()
+				.anyRequest().authenticated() // 모든요청은 인가되어야함.
 				/*
 				 * UserDeatils 관련 서비스는 Resource Server에서 담당해야 맞다.
 				 */
-				//.anyRequest().authenticated() // 모든요청은 인가되어야함.
 		.and()
 			.exceptionHandling()
-				.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/member/signin"))
+//				.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/member/signin"))
+				.authenticationEntryPoint(new AjaxAuthenticationEntryPoint())
 		.and()
-			.addFilterBefore(ajaxAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-			.addFilterBefore(jwtAuthenticationFilter(), FilterSecurityInterceptor.class)
+//			.addFilterBefore(ajaxAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+//			.addFilterBefore(jwtAuthorizationFilter(), FilterSecurityInterceptor.class)
 			.logout()
 				.logoutUrl("/member/signout")
 				.clearAuthentication(true)
@@ -158,32 +167,33 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.formLogin()
 				.loginPage("/member/signin")
 				.loginProcessingUrl("/member/signin")
+				.successHandler(new AjaxAuthenticationSuccessHandler())
+				.failureHandler(new AjaxAuthenticationFailureHandler())
 		.and()
-//				.disable()
 			/*
 			 * Authorization Code Grant를 위한 설정
 			 */
-			.oauth2Login()
-				.loginPage("/member/signin")
-//					.loginProcessingUrl("/member/signin/oauth2/code/*")
-				.authorizationEndpoint()
-					.baseUri("/member/signin/oauth2/authorization") //OAuth2 인가서버들의 baseuri설정 default:/login/oauth2/authorization/
-					.authorizationRequestRepository(this.authorizationRequestRepository())
-			.and()
-				.redirectionEndpoint() //redirection endpoint 설정 default: /login/oauth2/code/*
-					.baseUri("/member/signin/oauth2/code/*")
-			.and()
-				.tokenEndpoint()
-					.accessTokenResponseClient(this.accessTokenResponseClient()) //tokenEndpoint(code로 token 받아오는..)
-			.and()
-				.userInfoEndpoint()	//token으로  userinfo 받아옴
-					.userService(this.customOAuth2UserSerivce)
-			.and()
-		.and()
+//			.oauth2Login()
+//				.loginPage("/member/signin")
+////					.loginProcessingUrl("/member/signin/oauth2/code/*")
+//				.authorizationEndpoint()
+//					.baseUri("/member/signin/oauth2/authorization") //OAuth2 인가서버들의 baseuri설정 default:/login/oauth2/authorization/
+//					.authorizationRequestRepository(this.authorizationRequestRepository())
+//			.and()
+//				.redirectionEndpoint() //redirection endpoint 설정 default: /login/oauth2/code/*
+//					.baseUri("/member/signin/oauth2/code/*")
+//			.and()
+//				.tokenEndpoint()
+//					.accessTokenResponseClient(this.accessTokenResponseClient()) //tokenEndpoint(code로 token 받아오는..)
+//			.and()
+//				.userInfoEndpoint()	//token으로  userinfo 받아옴
+//					.userService(this.customOAuth2UserSerivce)
+//			.and()
+//		.and()
 			.csrf()
-				.disable()
-			.sessionManagement()
-				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+				.disable();
+//			.sessionManagement()
+//				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 			
 	}
 
