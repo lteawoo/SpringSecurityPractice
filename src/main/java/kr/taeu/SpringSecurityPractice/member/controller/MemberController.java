@@ -2,13 +2,13 @@ package kr.taeu.SpringSecurityPractice.member.controller;
 
 import javax.validation.Valid;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import kr.taeu.SpringSecurityPractice.member.dto.MemberResponse;
@@ -35,11 +35,6 @@ public class MemberController {
 		return new MemberResponse(memberDetailsService.signUp(signUpRequest));
 	}
 	
-	@GetMapping(value = "/signup_success")
-	public String signUpSuccess(Model model) {
-		return "signup_success";
-	}
-	
 	@GetMapping(value = "/signin")
 	public String signIn(Model model) {
 		return "signin";
@@ -47,7 +42,7 @@ public class MemberController {
 	
 	@GetMapping(value = "/welcome")
 	@ResponseBody
-	public String welcome() {
-		return "";
+	public String welcome(Authentication authentication) {
+		return authentication.getName();
 	}
 }

@@ -17,7 +17,7 @@ public class AjaxAuthenticationSuccessHandler implements AuthenticationSuccessHa
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 			Authentication authentication) throws IOException, ServletException {
 		RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
-	    redirectStrategy.sendRedirect(request, response, "/welcome/"+authentication.getName());
+	    redirectStrategy.sendRedirect(request, response, "/member/welcome");
 	}
 
 }
